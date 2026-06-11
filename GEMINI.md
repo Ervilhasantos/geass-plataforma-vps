@@ -58,10 +58,14 @@ A aplicação passou por uma auditoria de segurança rigorosa focada no OWASP To
 - **Políticas RLS de Admin e WITH CHECK**: Todas as políticas de admin possuem cláusulas `WITH CHECK` ativas para evitar a persistência de dados incorretos e violações de autorização (CWE-863).
 - **Verificação de Acesso Admin e Funções de Roteamento Seguras**: A função `is_admin()` foi atualizada para consultar a tabela de usuários via `auth.uid()` em uma função com privilégios `SECURITY DEFINER` protegida. Criou-se também a função `get_user_email()` para gerenciar as permissões dos alunos nas políticas RLS sem expor a tabela `auth.users` diretamente nem depender de dados obsoletos do JWT.
 - **Segurança de Storage**: O bucket de armazenamento público `materiais` foi restringido via RLS para permitir uploads (`INSERT`) apenas ao Admin, prevenindo o envio de arquivos não autorizados por alunos autenticados.
+- **Monitoramento de Sessões e Dispositivos (Exclusivo Admin)**: O painel administrativo possui uma aba para monitorar contas conectadas e sessões de dispositivos ativos. Essa funcionalidade utiliza as RPCs `obter_sessoes_ativas()`, `encerrar_sessao(sessao_id)` e `encerrar_todas_sessoes_usuario(target_user_id)` configuradas de forma segura com `SECURITY DEFINER` e validação do e-mail administrativo. O frontend renderiza de forma amigável o dispositivo (User-Agent decodificado), o endereço IP capturado nativamente pelo Supabase, a data de atividade, e sinaliza alertas visuais de "Compartilhamento Suspeito" para contas com 3 ou mais dispositivos ativos, permitindo ao administrador deslogar dispositivos específicos ou derrubar todas as sessões da conta com um clique.
+
 
 ## Deploy e Produção
 - **Coolify**: A plataforma está configurada para deploy automatizado na VPS via Coolify.
+  - Repositório Remoto: [Ervilhasantos/geass-plataforma-vps](https://github.com/Ervilhasantos/geass-plataforma-vps)
   - URL da API do Coolify: `http://161.153.107.203:8000`
+  - URL Temporária Ativa: `http://t22vxbftv3bh5ptvvjzdjpfc.161.153.107.203.sslip.io`
   - A integração com a IA (MCP do Coolify) foi atualizada e está funcional para gerenciar os deploys diretamente pelo agente.
 
 ## Próximos Passos

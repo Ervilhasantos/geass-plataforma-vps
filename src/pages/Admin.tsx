@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, UserPlus, Edit3, Trash2, Check, X, Folder, Play, BookOpen, ChevronDown, ChevronRight } from 'lucide-react';
+import { Plus, UserPlus, Edit3, Trash2, Check, X, Folder, Play, BookOpen, ChevronDown, ChevronRight, Monitor, Smartphone, RefreshCw, ShieldAlert } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Admin() {
@@ -34,6 +34,11 @@ export default function Admin() {
   const [buscandoNomes, setBuscandoNomes] = useState(false);
   const [carregandoLote, setCarregandoLote] = useState(false);
   const [subindoPdf, setSubindoPdf] = useState(false);
+
+  // Estados para sessões e dispositivos ativos
+  const [sessoes, setSessoes] = useState<any[]>([]);
+  const [mostrarSessoes, setMostrarSessoes] = useState(false);
+  const [loadingSessoes, setLoadingSessoes] = useState(false);
 
   useEffect(() => {
     checkAccess();
@@ -78,6 +83,77 @@ export default function Admin() {
       setPermissoes(data);
     }
   };
+
+  const fetchSessoes = async () => {
+    setLoadingSessoes(true);
+    try {
+      const { data, error } = await supabase.rpc('obter_sessoes_ativas');
+      if (error) {
+        alert('Erro ao carregar sessões ativas: ' + error.message);
+      } else if (data) {
+        setSessoes(data);
+      }
+    } catch (err: any) {
+      console.error('Erro ao buscar sessões:', err.message);
+    } finally {
+      setLoadingSessoes(false);
+    }
+  };
+
+  const handleDerrubarSessao = async (sessaoId: string, email: string, device: string) => {
+    if (!confirm(`Tem certeza que deseja desconectar o dispositivo "${device}" logado na conta ${email}?`)) return;
+    
+    try {
+      const { error } = await supabase.rpc('encerrar_sessao', { sessao_id: sessaoId });
+      if (error) throw error;
+      
+      alert('Dispositivo desconectado com sucesso!');
+      await fetchSessoes();
+    } catch (err: any) {
+      alert('Erro ao desconectar dispositivo: ' + err.message);
+    }
+  };
+
+  const handleDerrubarTodasSessoes = async (userId: string, email: string) => {
+    if (!confirm(`Tem certeza que deseja desconectar TODOS os dispositivos logados na conta ${email}?`)) return;
+    
+    try {
+      const { error } = await supabase.rpc('encerrar_todas_sessoes_usuario', { target_user_id: userId });
+      if (error) throw error;
+      
+      alert(`Todas as sessões de ${email} foram encerradas!`);
+      await fetchSessoes();
+    } catch (err: any) {
+      alert('Erro ao desconectar todos os dispositivos: ' + err.message);
+    }
+  };
+
+  const formatarUserAgent = (ua: string) => {
+    if (!ua) return 'Dispositivo desconhecido';
+    
+    let os = 'Dispositivo';
+    if (ua.includes('Windows')) os = 'Windows';
+    else if (ua.includes('Macintosh') || ua.includes('Mac OS')) os = 'Mac OS';
+    else if (ua.includes('iPhone')) os = 'iPhone';
+    else if (ua.includes('iPad')) os = 'iPad';
+    else if (ua.includes('Android')) os = 'Android';
+    else if (ua.includes('Linux')) os = 'Linux';
+
+    let browser = 'Navegador';
+    if (ua.includes('Chrome') && !ua.includes('Chromium') && !ua.includes('Edg') && !ua.includes('OPR')) browser = 'Chrome';
+    else if (ua.includes('Safari') && !ua.includes('Chrome') && !ua.includes('Chromium')) browser = 'Safari';
+    else if (ua.includes('Firefox')) browser = 'Firefox';
+    else if (ua.includes('Edg')) browser = 'Edge';
+    else if (ua.includes('OPR') || ua.includes('Opera')) browser = 'Opera';
+    
+    return `${os} (${browser})`;
+  };
+
+  useEffect(() => {
+    if (mostrarSessoes) {
+      fetchSessoes();
+    }
+  }, [mostrarSessoes]);
 
   const handleRemoverAcesso = async (id: string, email: string, nomeCurso: string) => {
     if (!confirm(`Tem certeza que deseja remover o acesso do e-mail ${email} ao curso "${nomeCurso}"?`)) return;
@@ -1002,6 +1078,188 @@ export default function Admin() {
                 </div>
               );
             })}
+          </div>
+        )}
+      </div>
+
+      {/* Aba de Sessões e Dispositivos Online */}
+      <div className="glass-panel" style={{ marginTop: '3rem', padding: '1.5rem' }}>
+        <button 
+          onClick={() => setMostrarSessoes(!mostrarSessoes)}
+          className="btn"
+          style={{ 
+            width: '100%', 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            padding: '1rem',
+            borderRadius: '12px',
+            fontSize: '1.1rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            color: 'var(--text-color)'
+          }}
+        >
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <Monitor size={20} style={{ color: 'var(--primary-color)' }} /> 
+            Contas Conectadas e Dispositivos Logados
+          </span>
+          {mostrarSessoes ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+        </button>
+
+        {mostrarSessoes && (
+          <div style={{ marginTop: '1.5rem' }}>
+            <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+                Total de sessões ativas: <strong style={{ color: 'var(--primary-color)' }}>{sessoes.length}</strong> dispositivo(s) em <strong style={{ color: 'var(--primary-color)' }}>{Object.keys(sessoes.reduce((acc: any, s) => ({ ...acc, [s.email]: true }), {})).length}</strong> conta(s).
+              </div>
+              <button 
+                onClick={fetchSessoes} 
+                className="btn btn-outline" 
+                disabled={loadingSessoes}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+              >
+                <RefreshCw size={14} className={loadingSessoes ? 'spin-animation' : ''} />
+                {loadingSessoes ? 'Atualizando...' : 'Atualizar Lista'}
+              </button>
+            </div>
+
+            {loadingSessoes && sessoes.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.6 }}>Carregando sessões...</div>
+            ) : sessoes.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.6, fontStyle: 'italic' }}>Nenhuma sessão ativa encontrada.</div>
+            ) : (
+              <div style={{ display: 'flex', flexDirection: 'column', gap: '1.5rem' }}>
+                {Object.entries(
+                  sessoes.reduce((acc: Record<string, any[]>, sessao) => {
+                    const email = sessao.email || 'Sem e-mail';
+                    if (!acc[email]) acc[email] = [];
+                    acc[email].push(sessao);
+                    return acc;
+                  }, {})
+                ).map(([email, userSessoes]) => {
+                  const hasSuspiciousSharing = userSessoes.length >= 3;
+                  const firstUserId = userSessoes[0]?.user_id;
+
+                  return (
+                    <div 
+                      key={email} 
+                      style={{ 
+                        borderBottom: '1px solid rgba(255,255,255,0.05)', 
+                        paddingBottom: '1.5rem',
+                        backgroundColor: hasSuspiciousSharing ? 'rgba(239, 68, 68, 0.02)' : 'transparent',
+                        padding: hasSuspiciousSharing ? '1rem' : '0rem',
+                        borderRadius: hasSuspiciousSharing ? '8px' : '0px',
+                        border: hasSuspiciousSharing ? '1px dashed rgba(239, 68, 68, 0.2)' : 'none',
+                        transition: 'all 0.3s ease'
+                      }}
+                    >
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
+                        <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem', margin: 0 }}>
+                          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{email}</span>
+                          <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.08)', padding: '0.1rem 0.4rem', borderRadius: '4px', opacity: 0.7 }}>
+                            {userSessoes.length} {userSessoes.length === 1 ? 'dispositivo' : 'dispositivos'}
+                          </span>
+                          {hasSuspiciousSharing && (
+                            <span 
+                              style={{ 
+                                display: 'inline-flex', 
+                                alignItems: 'center', 
+                                gap: '0.25rem', 
+                                fontSize: '0.75rem', 
+                                color: '#f87171', 
+                                background: 'rgba(239, 68, 68, 0.1)', 
+                                padding: '0.1rem 0.5rem', 
+                                borderRadius: '4px',
+                                fontWeight: 'bold' 
+                              }}
+                            >
+                              <ShieldAlert size={12} /> Compartilhamento Suspeito!
+                            </span>
+                          )}
+                        </h4>
+                        
+                        {firstUserId && (
+                          <button
+                            onClick={() => handleDerrubarTodasSessoes(firstUserId, email)}
+                            className="btn btn-outline"
+                            style={{ 
+                              padding: '0.25rem 0.6rem', 
+                              fontSize: '0.75rem', 
+                              color: '#ef4444', 
+                              borderColor: 'rgba(239, 68, 68, 0.2)',
+                              background: 'rgba(239, 68, 68, 0.02)'
+                            }}
+                          >
+                            Derrubar Todas as Sessões
+                          </button>
+                        )}
+                      </div>
+
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '0.75rem', paddingLeft: hasSuspiciousSharing ? '0rem' : '1rem' }}>
+                        {userSessoes.map((sessao) => {
+                          const deviceFriendly = formatarUserAgent(sessao.user_agent);
+                          const isMobile = sessao.user_agent?.includes('iPhone') || sessao.user_agent?.includes('Android') || sessao.user_agent?.includes('iPad');
+                          const formatarData = (dataStr: string) => {
+                            const date = new Date(dataStr);
+                            return date.toLocaleString('pt-BR');
+                          };
+
+                          return (
+                            <div 
+                              key={sessao.id_sessao} 
+                              style={{ 
+                                display: 'flex', 
+                                justifyContent: 'space-between', 
+                                alignItems: 'center', 
+                                background: 'rgba(255,255,255,0.01)', 
+                                padding: '0.6rem 0.8rem', 
+                                borderRadius: '8px',
+                                border: '1px solid rgba(255,255,255,0.04)'
+                              }}
+                            >
+                              <div style={{ display: 'flex', gap: '0.6rem', alignItems: 'center', minWidth: 0, flex: 1 }}>
+                                <div style={{ opacity: 0.6 }}>
+                                  {isMobile ? <Smartphone size={16} /> : <Monitor size={16} />}
+                                </div>
+                                <div style={{ minWidth: 0, flex: 1 }}>
+                                  <div style={{ fontSize: '0.85rem', fontWeight: 600, textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }} title={sessao.user_agent}>
+                                    {deviceFriendly}
+                                  </div>
+                                  <div style={{ fontSize: '0.75rem', opacity: 0.5, display: 'flex', flexWrap: 'wrap', gap: '0.5rem', marginTop: '0.1rem' }}>
+                                    <span>IP: {sessao.ip?.replace('/32', '')}</span>
+                                    <span>• Atividade: {formatarData(sessao.updated_at)}</span>
+                                  </div>
+                                </div>
+                              </div>
+                              <button 
+                                onClick={() => handleDerrubarSessao(sessao.id_sessao, email, deviceFriendly)} 
+                                className="btn" 
+                                style={{ 
+                                  padding: '0.3rem', 
+                                  color: '#ef4444', 
+                                  backgroundColor: 'transparent',
+                                  border: 'none',
+                                  cursor: 'pointer',
+                                  display: 'flex',
+                                  alignItems: 'center',
+                                  justifyContent: 'center'
+                                }} 
+                                title="Desconectar dispositivo"
+                              >
+                                <X size={16} />
+                              </button>
+                            </div>
+                          );
+                        })}
+                      </div>
+                    </div>
+                  );
+                })}
+              </div>
+            )}
           </div>
         )}
       </div>

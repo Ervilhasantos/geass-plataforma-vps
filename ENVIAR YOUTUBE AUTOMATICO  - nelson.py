@@ -16,9 +16,9 @@ from webdriver_manager.chrome import ChromeDriverManager
 # ==============================================================================
 # CONFIGURAÇÕES DE CAMINHOS DO USUÁRIO
 # ==============================================================================
-PASTA_VIDEOS = r"C:\Users\Zoom Personalizados\Documents\CURSOS\FELIPE DECHAMPS"
+PASTA_VIDEOS = r"C:\Users\Zoom Personalizados\Documents\CURSOS\GUSTAVO ONILDE"
 CAMINHO_PERFIL_CHROME = r"C:\Users\Zoom Personalizados\AppData\Local\Google\Chrome\User Data"
-NOME_PERFIL = "Profile 4"
+NOME_PERFIL = "Profile 15"
 ARQUIVO_RESULTADOS = "aulas_youtube.csv"
 ARQUIVO_TXT = "links_ordenados.txt"
 
