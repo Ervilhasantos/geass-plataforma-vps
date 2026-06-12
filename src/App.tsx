@@ -4,6 +4,7 @@ import Layout from './components/Layout';
 import Login from './pages/Login';
 import Dashboard from './pages/Dashboard';
 import Course from './pages/Course';
+import ResetPassword from './pages/ResetPassword';
 import StatsDashboard from './pages/StatsDashboard';
 import GoalsDashboard from './pages/GoalsDashboard';
 import { supabase } from './lib/supabase';
@@ -37,6 +38,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={!session ? <Login /> : <Navigate to="/" />} />
+        <Route path="/reset-password" element={!session ? <ResetPassword /> : <Navigate to="/" />} />
         <Route path="/" element={session ? <Layout /> : <Navigate to="/login" />}>
           <Route index element={<Dashboard />} />
           <Route path="stats" element={<StatsDashboard />} />
