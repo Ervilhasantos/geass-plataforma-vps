@@ -1,6 +1,6 @@
 import { useEffect, useState, type FormEvent } from 'react';
 import { supabase } from '../lib/supabase';
-import { Plus, UserPlus, Edit3, Trash2, Check, X, Folder, Play, BookOpen, ChevronDown, ChevronRight, Monitor, Smartphone, RefreshCw, ShieldAlert } from 'lucide-react';
+import { Plus, UserPlus, Edit3, Trash2, Check, X, Folder, Play, BookOpen, ChevronDown, ChevronRight, Monitor, Smartphone, RefreshCw, ShieldAlert, Eye } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 
 export default function Admin() {
@@ -148,6 +148,12 @@ export default function Admin() {
     } catch (err: any) {
       alert('Erro ao desconectar todos os dispositivos: ' + err.message);
     }
+  };
+
+  const handleVisualizarComoAluno = (id: string, email: string) => {
+    localStorage.setItem('geass:impersonate', JSON.stringify({ id, email }));
+    navigate('/');
+    window.location.reload();
   };
 
   const formatarUserAgent = (ua: string) => {
@@ -1169,9 +1175,29 @@ export default function Admin() {
                     <span style={{ fontSize: '0.9rem', fontWeight: 'bold', wordBreak: 'break-all' }}>
                       {perfil.email}
                     </span>
-                    <div style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '0.25rem', display: 'flex', justifyContent: 'space-between' }}>
-                      <span>Status: {perfil.confirmado ? 'Confirmado' : 'Pendente'}</span>
-                      <span>{new Date(perfil.created_at).toLocaleDateString('pt-BR')}</span>
+                    <div style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '0.25rem', display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                      <div style={{ display: 'flex', flexDirection: 'column' }}>
+                        <span>Status: {perfil.confirmado ? 'Confirmado' : 'Pendente'}</span>
+                        <span>{new Date(perfil.created_at).toLocaleDateString('pt-BR')}</span>
+                      </div>
+                      <button
+                        onClick={() => handleVisualizarComoAluno(perfil.id, perfil.email)}
+                        className="btn btn-outline"
+                        style={{ 
+                          padding: '0.3rem 0.6rem', 
+                          fontSize: '0.75rem', 
+                          display: 'flex', 
+                          alignItems: 'center', 
+                          gap: '0.3rem', 
+                          borderColor: 'rgba(255,255,255,0.15)',
+                          borderRadius: '6px',
+                          cursor: 'pointer'
+                        }}
+                        title="Visualizar plataforma como este aluno"
+                      >
+                        <Eye size={12} />
+                        Ver como
+                      </button>
                     </div>
                   </div>
                 ))}

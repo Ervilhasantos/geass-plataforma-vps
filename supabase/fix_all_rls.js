@@ -106,6 +106,13 @@ CREATE POLICY "Admin gerencia todos progressos diarios" ON public.progresso_diar
   USING (is_admin()) 
   WITH CHECK (is_admin());
 
+-- Progresso (Admin)
+DROP POLICY IF EXISTS "Admin tem acesso total ao progresso" ON public.progresso;
+CREATE POLICY "Admin tem acesso total ao progresso" ON public.progresso 
+  FOR ALL 
+  USING (is_admin()) 
+  WITH CHECK (is_admin());
+
 -- 5. Otimização da política do Supabase Storage para restringir o bucket 'materiais' apenas ao Admin para uploads
 -- Nota: se a política padrão de INSERT do storage do Supabase para materiais existir, podemos atualizá-la
 DO $$
@@ -114,6 +121,7 @@ BEGIN
   IF EXISTS (SELECT 1 FROM pg_namespace WHERE nspname = 'storage') THEN
     DROP POLICY IF EXISTS "Permitir upload para materiais" ON storage.objects;
     DROP POLICY IF EXISTS "Upload de materiais por autenticados" ON storage.objects;
+    DROP POLICY IF EXISTS "Upload de materiais restrito ao Admin" ON storage.objects;
     
     -- Cria nova política exigindo ser admin para upload no bucket materiais
     CREATE POLICY "Upload de materiais restrito ao Admin" ON storage.objects 
