@@ -40,6 +40,11 @@ export default function Admin() {
   const [mostrarSessoes, setMostrarSessoes] = useState(false);
   const [loadingSessoes, setLoadingSessoes] = useState(false);
 
+  // Estados para perfis
+  const [perfis, setPerfis] = useState<any[]>([]);
+  const [mostrarPerfis, setMostrarPerfis] = useState(false);
+  const [loadingPerfis, setLoadingPerfis] = useState(false);
+
   useEffect(() => {
     checkAccess();
   }, []);
@@ -99,6 +104,23 @@ export default function Admin() {
       setLoadingSessoes(false);
     }
   };
+
+  const fetchPerfis = async () => {
+    setLoadingPerfis(true);
+    const { data, error } = await supabase.from('perfis').select('*').order('created_at', { ascending: false });
+    if (error) {
+      console.error('Erro ao buscar perfis:', error.message);
+    } else if (data) {
+      setPerfis(data);
+    }
+    setLoadingPerfis(false);
+  };
+
+  useEffect(() => {
+    if (mostrarPerfis) {
+      fetchPerfis();
+    }
+  }, [mostrarPerfis]);
 
   const handleDerrubarSessao = async (sessaoId: string, email: string, device: string) => {
     if (!confirm(`Tem certeza que deseja desconectar o dispositivo "${device}" logado na conta ${email}?`)) return;
@@ -1078,6 +1100,83 @@ export default function Admin() {
                 </div>
               );
             })}
+          </div>
+        )}
+      </div>
+
+      {/* Aba de Usuários Cadastrados (Perfis) */}
+      <div className="glass-panel" style={{ marginTop: '3rem', padding: '1.5rem' }}>
+        <button 
+          onClick={() => setMostrarPerfis(!mostrarPerfis)}
+          className="btn"
+          style={{ 
+            width: '100%', 
+            display: 'flex', 
+            justifyContent: 'space-between', 
+            alignItems: 'center',
+            background: 'rgba(255,255,255,0.02)',
+            border: '1px solid rgba(255,255,255,0.1)',
+            padding: '1rem',
+            borderRadius: '12px',
+            fontSize: '1.1rem',
+            fontWeight: 600,
+            cursor: 'pointer',
+            color: 'var(--text-color)'
+          }}
+        >
+          <span style={{ display: 'flex', alignItems: 'center', gap: '0.5rem' }}>
+            <UserPlus size={20} style={{ color: 'var(--primary-color)' }} /> 
+            Todos os Usuários Cadastrados
+          </span>
+          {mostrarPerfis ? <ChevronDown size={20} /> : <ChevronRight size={20} />}
+        </button>
+
+        {mostrarPerfis && (
+          <div style={{ marginTop: '1.5rem' }}>
+             <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '1.5rem', flexWrap: 'wrap', gap: '1rem' }}>
+              <div style={{ fontSize: '0.9rem', opacity: 0.8 }}>
+                Total de cadastros: <strong style={{ color: 'var(--primary-color)' }}>{perfis.length}</strong> usuário(s).
+              </div>
+              <button 
+                onClick={fetchPerfis} 
+                className="btn btn-outline" 
+                disabled={loadingPerfis}
+                style={{ display: 'flex', alignItems: 'center', gap: '0.4rem', padding: '0.4rem 0.8rem', fontSize: '0.85rem' }}
+              >
+                <RefreshCw size={14} className={loadingPerfis ? 'spin-animation' : ''} />
+                {loadingPerfis ? 'Atualizando...' : 'Atualizar Lista'}
+              </button>
+            </div>
+
+            {loadingPerfis && perfis.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.6 }}>Carregando perfis...</div>
+            ) : perfis.length === 0 ? (
+              <div style={{ textAlign: 'center', padding: '2rem', opacity: 0.6, fontStyle: 'italic' }}>Nenhum usuário cadastrado.</div>
+            ) : (
+              <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem' }}>
+                {perfis.map((perfil) => (
+                  <div 
+                    key={perfil.id} 
+                    style={{ 
+                      display: 'flex', 
+                      flexDirection: 'column', 
+                      background: 'rgba(255,255,255,0.02)', 
+                      padding: '0.75rem', 
+                      borderRadius: '8px',
+                      border: '1px solid rgba(255,255,255,0.05)'
+                    }}
+                  >
+                    <span style={{ fontSize: '0.9rem', fontWeight: 'bold', wordBreak: 'break-all' }}>
+                      {perfil.email}
+                    </span>
+                    <div style={{ fontSize: '0.75rem', opacity: 0.6, marginTop: '0.25rem', display: 'flex', justifyContent: 'space-between' }}>
+                      <span>Status: {perfil.confirmado ? 'Confirmado' : 'Pendente'}</span>
+                      <span>{new Date(perfil.created_at).toLocaleDateString('pt-BR')}</span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+            )}
           </div>
         )}
       </div>

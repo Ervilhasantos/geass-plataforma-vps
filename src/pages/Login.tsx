@@ -26,7 +26,7 @@ export default function Login() {
       } else {
         const { error } = await supabase.auth.signUp({ email: formattedEmail, password });
         if (error) throw error;
-        setMessage('Cadastro realizado com sucesso! Redirecionando...');
+        setMessage('Cadastro realizado! Verifique seu e-mail para confirmar a conta.');
       }
     } catch (err: any) {
       setError(err.message || 'Ocorreu um erro.');
