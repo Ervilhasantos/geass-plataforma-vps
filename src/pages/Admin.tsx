@@ -160,11 +160,11 @@ export default function Admin() {
     if (!ua) return 'Dispositivo desconhecido';
     
     let os = 'Dispositivo';
-    if (ua.includes('Windows')) os = 'Windows';
-    else if (ua.includes('Macintosh') || ua.includes('Mac OS')) os = 'Mac OS';
-    else if (ua.includes('iPhone')) os = 'iPhone';
+    if (ua.includes('iPhone')) os = 'iPhone';
     else if (ua.includes('iPad')) os = 'iPad';
     else if (ua.includes('Android')) os = 'Android';
+    else if (ua.includes('Windows')) os = 'Windows';
+    else if (ua.includes('Macintosh') || ua.includes('Mac OS')) os = 'Mac OS';
     else if (ua.includes('Linux')) os = 'Linux';
 
     let browser = 'Navegador';

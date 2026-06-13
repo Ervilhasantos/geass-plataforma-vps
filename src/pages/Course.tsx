@@ -33,6 +33,29 @@ export default function Course() {
 
   useEffect(() => {
     const fetchData = async () => {
+      // Buscar usuário
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) {
+        setLoading(false);
+        return;
+      }
+
+      // Se não for admin de verdade (ou for admin simulando o aluno), verifica a permissão ao curso
+      if (user.email?.toLowerCase() !== 'nelsonvilhasantos@gmail.com') {
+        const { data: permissao } = await supabase
+          .from('permissoes')
+          .select('id')
+          .eq('curso_id', id)
+          .eq('user_email', user.email)
+          .maybeSingle();
+
+        if (!permissao) {
+          setCurso(null);
+          setLoading(false);
+          return;
+        }
+      }
+
       // Buscar curso
       const { data: cursoData } = await supabase.from('cursos').select('*').eq('id', id).single();
       if (!cursoData) {
@@ -41,8 +64,6 @@ export default function Course() {
       }
       setCurso(cursoData);
 
-      // Buscar usuário, meta e progresso diário de hoje
-      const { data: { user } } = await supabase.auth.getUser();
       if (user) {
         const hoje = new Date().toLocaleDateString('en-CA');
         const { data: metaData } = await supabase

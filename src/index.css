@@ -124,6 +124,9 @@ p {
 
 .sidebar {
   width: 80px;
+  min-width: 80px;
+  max-width: 80px;
+  flex-shrink: 0;
   background-color: var(--sidebar-bg);
   border-right: 1px solid var(--border-color);
   display: flex;
@@ -188,6 +191,8 @@ p {
   
   .sidebar {
     width: 100%;
+    min-width: auto;
+    max-width: auto;
     flex-direction: row;
     justify-content: space-between;
     padding: 0.5rem 1rem;

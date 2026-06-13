@@ -492,7 +492,9 @@ export default function StatsDashboard() {
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-color)', opacity: 0.5 }} />
                 <YAxis axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-color)', opacity: 0.5 }} />
                 <Tooltip 
-                  contentStyle={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)', color: 'var(--text-color)', borderRadius: '8px' }}
+                  contentStyle={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)', borderRadius: '8px' }}
+                  itemStyle={{ color: 'var(--text-color)' }}
+                  labelStyle={{ color: 'var(--text-color)', fontWeight: 600 }}
                   formatter={(value: any) => [`${value} h`, '']}
                 />
                 {topCursos.map((curso, index) => (
@@ -547,7 +549,9 @@ export default function StatsDashboard() {
                 <Tooltip 
                   cursor={{ fill: 'rgba(128, 128, 128, 0.1)' }}
                   formatter={(value: any) => [`${value} min`, 'Estudado']}
-                  contentStyle={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)', color: 'var(--text-color)', borderRadius: '8px' }}
+                  contentStyle={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)', borderRadius: '8px' }}
+                  itemStyle={{ color: 'var(--text-color)' }}
+                  labelStyle={{ color: 'var(--text-color)', fontWeight: 600 }}
                 />
                 <Bar dataKey="tempo" radius={[6, 6, 6, 6]}>
                   {chartDataSemanal.map((_, index) => (
@@ -596,7 +600,9 @@ export default function StatsDashboard() {
                   </Pie>
                   <Tooltip 
                     formatter={(value: any) => [`${Math.round(value/60)} minutos`, 'Tempo']}
-                    contentStyle={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)', color: 'var(--text-color)', borderRadius: '8px', zIndex: 10 }}
+                    contentStyle={{ backgroundColor: 'var(--surface-color)', borderColor: 'var(--border-color)', borderRadius: '8px', zIndex: 10 }}
+                    itemStyle={{ color: 'var(--text-color)' }}
+                    labelStyle={{ color: 'var(--text-color)', fontWeight: 600 }}
                   />
                 </PieChart>
               </ResponsiveContainer>
