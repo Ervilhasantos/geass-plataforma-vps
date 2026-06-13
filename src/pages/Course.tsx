@@ -40,15 +40,29 @@ export default function Course() {
         return;
       }
 
-      // Se não for admin de verdade (ou for admin simulando o aluno), verifica a permissão ao curso
-      if (user.email?.toLowerCase() !== 'nelsonvilhasantos@gmail.com') {
-        const { data: permissao } = await supabase
-          .from('permissoes')
-          .select('id')
-          .eq('curso_id', id)
-          .eq('user_email', user.email)
-          .maybeSingle();
+      const hoje = new Date().toLocaleDateString('en-CA');
+      const isNelson = user.email?.toLowerCase() === 'nelsonvilhasantos@gmail.com';
 
+      // Disparar queries de Curso, Metas, Progresso Diário e Módulos em paralelo
+      const promises: Promise<any>[] = [
+        Promise.resolve(supabase.from('cursos').select('*').eq('id', id).single()),
+        Promise.resolve(supabase.from('metas_estudo').select('*').eq('user_id', user.id).eq('curso_id', id).maybeSingle()),
+        Promise.resolve(supabase.from('progresso_diario').select('*').eq('user_id', user.id).eq('curso_id', id).eq('data_estudo', hoje).maybeSingle()),
+        Promise.resolve(supabase.from('modulos').select('*').eq('curso_id', id).order('ordem', { ascending: true }))
+      ];
+
+      // Se não for admin, adicionamos a query de permissão
+      if (!isNelson) {
+        promises.push(
+          Promise.resolve(supabase.from('permissoes').select('id').eq('curso_id', id).eq('user_email', user.email).maybeSingle())
+        );
+      }
+
+      const [cursoRes, metaRes, progressoDiarioRes, modulosRes, permissaoRes] = await Promise.all(promises);
+
+      // Verificar permissão
+      if (!isNelson) {
+        const permissao = permissaoRes?.data;
         if (!permissao) {
           setCurso(null);
           setLoading(false);
@@ -56,56 +70,32 @@ export default function Course() {
         }
       }
 
-      // Buscar curso
-      const { data: cursoData } = await supabase.from('cursos').select('*').eq('id', id).single();
+      const cursoData = cursoRes.data;
       if (!cursoData) {
         setLoading(false);
         return;
       }
       setCurso(cursoData);
 
-      if (user) {
-        const hoje = new Date().toLocaleDateString('en-CA');
-        const { data: metaData } = await supabase
-          .from('metas_estudo')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('curso_id', id)
-          .maybeSingle();
-
-        const { data: progHoje } = await supabase
-          .from('progresso_diario')
-          .select('*')
-          .eq('user_id', user.id)
-          .eq('curso_id', id)
-          .eq('data_estudo', hoje)
-          .maybeSingle();
-
-        if (metaData) {
-          setMetaMinutos(metaData.meta_minutos);
-          setStreakAtual(metaData.streak_atual || 0);
-          const segs = progHoje?.segundos_estudados || 0;
-          setSegundosEstudadosHoje(segs);
-          setMetaBatidaHoje(segs >= metaData.meta_minutos * 60 - 5);
-        }
+      const metaData = metaRes.data;
+      const progHoje = progressoDiarioRes.data;
+      if (metaData) {
+        setMetaMinutos(metaData.meta_minutos);
+        setStreakAtual(metaData.streak_atual || 0);
+        const segs = progHoje?.segundos_estudados || 0;
+        setSegundosEstudadosHoje(segs);
+        setMetaBatidaHoje(segs >= metaData.meta_minutos * 60 - 5);
       }
 
-      // Buscar modulos
-      const { data: modulosData } = await supabase
-        .from('modulos')
-        .select('*')
-        .eq('curso_id', id)
-        .order('ordem', { ascending: true });
-      if (modulosData) {
-        setModulos(modulosData);
-        const abertos: Record<string, boolean> = {};
-        modulosData.forEach(m => abertos[m.id] = false);
-        setModulosAbertos(abertos);
-      }
+      const modulosData = modulosRes.data || [];
+      setModulos(modulosData);
+      const abertos: Record<string, boolean> = {};
+      modulosData.forEach((m: any) => abertos[m.id] = false);
+      setModulosAbertos(abertos);
 
       // Buscar aulas do curso
-      if (modulosData && modulosData.length > 0) {
-        const moduloIds = modulosData.map(m => m.id);
+      if (modulosData.length > 0) {
+        const moduloIds = modulosData.map((m: any) => m.id);
         const { data: aulasData } = await supabase
           .from('aulas')
           .select('*')
@@ -114,7 +104,7 @@ export default function Course() {
         
         if (aulasData) {
           // Ordenar as aulas primeiro pela ordem do módulo correspondente e depois pela ordem da aula
-          const modulosOrderMap = new Map(modulosData.map((m, index) => [m.id, index]));
+          const modulosOrderMap = new Map<string, number>(modulosData.map((m: any, index: number) => [m.id, index]));
           const aulasOrdenadas = [...aulasData].sort((a, b) => {
             const orderA = modulosOrderMap.get(a.modulo_id) ?? 999;
             const orderB = modulosOrderMap.get(b.modulo_id) ?? 999;

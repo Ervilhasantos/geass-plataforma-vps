@@ -32,7 +32,7 @@ export default function Layout() {
       }
     };
     checkUser();
-  }, [location.pathname]);
+  }, []);
 
   const handleLogout = async () => {
     localStorage.removeItem('geass:impersonate');

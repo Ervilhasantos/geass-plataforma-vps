@@ -51,17 +51,14 @@ export default function StatsDashboard() {
           return;
         }
 
-        // Buscar progresso total
-        const { data: progressoData } = await supabase
-          .from('progresso')
-          .select('*')
-          .eq('user_id', user.id);
+        // Buscar progresso e permissões em paralelo
+        const [progressoRes, permissoesRes] = await Promise.all([
+          Promise.resolve(supabase.from('progresso').select('*').eq('user_id', user.id)),
+          Promise.resolve(supabase.from('permissoes').select('curso_id').eq('user_email', user.email))
+        ]);
 
-        // Buscar permissões
-        const { data: permissoesData } = await supabase
-          .from('permissoes')
-          .select('curso_id')
-          .eq('user_email', user.email);
+        const progressoData = progressoRes.data;
+        const permissoesData = permissoesRes.data;
 
         let concluidas = 0;
         let segundosT = 0;
@@ -72,22 +69,72 @@ export default function StatsDashboard() {
         let localAulasMap: Record<string, any> = {};
         let localModulosMap: Record<string, any> = {};
         let localCursosMap: Record<string, any> = {};
-        
+        let cursosPermitidosList: any[] = [];
+
+        const promises: Promise<any>[] = [];
+
+        // 1. Busca relacional de aulas, módulos e cursos
+        let aulasPromise = Promise.resolve<any>(null);
         if (aulaIds.length > 0) {
-            const { data: aData } = await supabase.from('aulas').select('*').in('id', aulaIds);
-            if (aData) {
-                aData.forEach(a => localAulasMap[a.id] = a);
-                const moduloIds = [...new Set(aData.map(a => a.modulo_id))];
-                const { data: mData } = await supabase.from('modulos').select('*').in('id', moduloIds);
-                if (mData) {
-                    mData.forEach(m => localModulosMap[m.id] = m);
-                    const cursoIds = [...new Set(mData.map(m => m.curso_id))];
-                    const { data: cData } = await supabase.from('cursos').select('*').in('id', cursoIds);
-                    if (cData) {
-                        cData.forEach(c => localCursosMap[c.id] = c);
-                    }
+          aulasPromise = Promise.resolve(supabase
+            .from('aulas')
+            .select('*, modulos(*, cursos(*))')
+            .in('id', aulaIds));
+          promises.push(aulasPromise);
+        }
+
+        // 2. Busca de cursos permitidos
+        const cursoIdsPermitidos = permissoesData ? permissoesData.map((p: any) => p.curso_id) : [];
+        let cursosPromise = Promise.resolve<any>(null);
+        if (cursoIdsPermitidos.length > 0) {
+          cursosPromise = Promise.resolve(supabase
+            .from('cursos')
+            .select('id, nome_curso')
+            .in('id', cursoIdsPermitidos));
+          promises.push(cursosPromise);
+        }
+
+        await Promise.all(promises);
+
+        // Processar resultados das aulas (desmembrando o select relacional)
+        if (aulaIds.length > 0) {
+          const aDataRes = await aulasPromise;
+          const aData = aDataRes?.data;
+          if (aData) {
+            aData.forEach((a: any) => {
+              let m = a.modulos;
+              if (Array.isArray(m)) m = m[0];
+              
+              const aulaInfo = { ...a };
+              delete aulaInfo.modulos;
+              localAulasMap[a.id] = aulaInfo;
+              
+              if (m) {
+                let c = m.cursos;
+                if (Array.isArray(c)) c = c[0];
+                
+                const moduloInfo = { ...m };
+                delete moduloInfo.cursos;
+                localModulosMap[m.id] = moduloInfo;
+                
+                if (c) {
+                  localCursosMap[c.id] = c;
                 }
-            }
+              }
+            });
+          }
+        }
+
+        // Processar resultados dos cursos permitidos
+        if (cursoIdsPermitidos.length > 0) {
+          const cDataRes = await cursosPromise;
+          const cDataPermitidos = cDataRes?.data;
+          if (cDataPermitidos) {
+            cursosPermitidosList = cDataPermitidos.map((c: any) => ({
+              id: c.id,
+              nome_curso: c.nome_curso
+            }));
+          }
         }
 
         progressoValido.forEach((p: any) => {
@@ -171,13 +218,10 @@ export default function StatsDashboard() {
         }));
         setChartDataSemanal(finalWeeklyData);
 
-        // Buscar progresso recente para a tabela inferior
-        const { data: progressoRecente } = await supabase
-          .from('progresso')
-          .select('*')
-          .eq('user_id', user.id)
-          .order('updated_at', { ascending: false })
-          .limit(5);
+        // Buscar progresso recente (processado em memória para economizar uma chamada ao banco)
+        const progressoRecente = [...progressoValido]
+          .sort((a: any, b: any) => new Date(b.updated_at).getTime() - new Date(a.updated_at).getTime())
+          .slice(0, 5);
 
         if (progressoRecente && progressoRecente.length > 0) {
             const listaHistorica = progressoRecente.map((p: any) => {
@@ -193,22 +237,6 @@ export default function StatsDashboard() {
               };
             });
             setHistoricoAulas(listaHistorica);
-        }
-
-        // Buscar todos os cursos disponíveis com permissão
-        const cursoIdsPermitidos = permissoesData ? permissoesData.map((p: any) => p.curso_id) : [];
-        let cursosPermitidosList: any[] = [];
-        if (cursoIdsPermitidos.length > 0) {
-          const { data: cDataPermitidos } = await supabase
-            .from('cursos')
-            .select('id, nome_curso')
-            .in('id', cursoIdsPermitidos);
-          if (cDataPermitidos) {
-            cursosPermitidosList = cDataPermitidos.map((c: any) => ({
-              id: c.id,
-              nome_curso: c.nome_curso
-            }));
-          }
         }
 
         // Adicionar cursos que possam ter progresso mas não estejam explicitamente no cDataPermitidos

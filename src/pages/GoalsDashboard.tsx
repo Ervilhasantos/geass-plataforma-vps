@@ -48,46 +48,41 @@ export default function GoalsDashboard() {
         return;
       }
 
-      // Buscar cursos
-      const { data: cursosData } = await supabase
-        .from('cursos')
-        .select('id, nome_curso')
-        .order('created_at', { ascending: false });
+      const hoje = new Date().toLocaleDateString('en-CA'); // Formato YYYY-MM-DD
+      const isNelson = user.email === 'nelsonvilhasantos@gmail.com';
 
-      let cursosFinais = cursosData || [];
-      
-      // Se não for admin, filtra pelas permissões
-      if (user.email !== 'nelsonvilhasantos@gmail.com') {
-        const { data: permissaoData } = await supabase
-          .from('permissoes')
-          .select('curso_id')
-          .eq('user_email', user.email);
+      // Disparar todas as queries em paralelo
+      const promises: Promise<any>[] = [
+        Promise.resolve(supabase.from('cursos').select('id, nome_curso').order('created_at', { ascending: false })),
+        Promise.resolve(supabase.from('metas_estudo').select('*').eq('user_id', user.id)),
+        Promise.resolve(supabase.from('progresso_diario').select('*').eq('user_id', user.id).eq('data_estudo', hoje))
+      ];
 
-        const permitidos = permissaoData?.map(p => p.curso_id) || [];
-        cursosFinais = cursosFinais.filter(c => permitidos.includes(c.id));
+      if (!isNelson) {
+        promises.push(
+          Promise.resolve(supabase.from('permissoes').select('curso_id').eq('user_email', user.email))
+        );
+      }
+
+      const [cursosRes, metasRes, progressoRes, permissoesRes] = await Promise.all(promises);
+
+      const cursosData = cursosRes.data || [];
+      const metasData = metasRes.data || [];
+      const progressoData = progressoRes.data || [];
+
+      let cursosFinais = cursosData;
+      if (!isNelson && permissoesRes) {
+        const permissaoData = permissoesRes.data || [];
+        const permitidos = permissaoData.map((p: any) => p.curso_id) || [];
+        cursosFinais = cursosFinais.filter((c: any) => permitidos.includes(c.id));
       }
 
       setCursosDisponiveis(cursosFinais);
-
-      // Buscar metas configuradas
-      const { data: metasData } = await supabase
-        .from('metas_estudo')
-        .select('*')
-        .eq('user_id', user.id);
-        
-      setMetas(metasData || []);
-
-      // Buscar progresso diário de hoje
-      const hoje = new Date().toLocaleDateString('en-CA'); // Formato YYYY-MM-DD
-      const { data: progressoData } = await supabase
-        .from('progresso_diario')
-        .select('*')
-        .eq('user_id', user.id)
-        .eq('data_estudo', hoje);
+      setMetas(metasData);
 
       const mapDiario: Record<string, ProgressoDiario> = {};
       if (progressoData) {
-        progressoData.forEach(p => {
+        progressoData.forEach((p: any) => {
           mapDiario[p.curso_id] = p;
         });
       }

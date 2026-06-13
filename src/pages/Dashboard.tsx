@@ -15,29 +15,26 @@ export default function Dashboard() {
         return;
       }
 
-      let query = supabase.from('cursos').select('*');
+      const isNelson = user.email?.toLowerCase() === 'nelsonvilhasantos@gmail.com';
 
-      // Se não for admin de verdade (ou for admin simulando o aluno), filtra pelos cursos que ele tem acesso
-      if (user.email?.toLowerCase() !== 'nelsonvilhasantos@gmail.com') {
-        const { data: permissaoData } = await supabase
-          .from('permissoes')
-          .select('curso_id')
-          .eq('user_email', user.email);
-
-        const permitidos = permissaoData?.map(p => p.curso_id) || [];
-        if (permitidos.length > 0) {
-          query = query.in('id', permitidos);
-        } else {
-          setCursos([]);
-          setLoading(false);
-          return;
+      if (isNelson) {
+        const { data, error } = await supabase
+          .from('cursos')
+          .select('*')
+          .order('created_at', { ascending: false });
+          
+        if (!error && data) {
+          setCursos(data);
         }
-      }
+      } else {
+        const [permissoesRes, cursosRes] = await Promise.all([
+          supabase.from('permissoes').select('curso_id').eq('user_email', user.email),
+          supabase.from('cursos').select('*').order('created_at', { ascending: false })
+        ]);
 
-      const { data, error } = await query.order('created_at', { ascending: false });
-        
-      if (!error && data) {
-        setCursos(data);
+        const permitidos = permissoesRes.data?.map(p => p.curso_id) || [];
+        const filteredCursos = (cursosRes.data || []).filter(c => permitidos.includes(c.id));
+        setCursos(filteredCursos);
       }
       setLoading(false);
     };
