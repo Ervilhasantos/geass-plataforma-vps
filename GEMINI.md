@@ -5,7 +5,7 @@ A Plataforma GEASS é um sistema de cursos focado em infoprodutos, estilo Kiwify
 
 ## Stack Tecnológica
 - **Frontend**: React, Vite, TypeScript
-- **Estilização**: CSS Puro com Variáveis (Glassmorphism), suporte a Dark Mode (Pure Black) e substituição da cor verde por Cinza Médio. A sidebar no desktop é estática com largura fixa em 80px para estabilidade visual com zoom ou redimensionamentos.
+- **Estilização**: CSS Puro com Variáveis (Glassmorphism), suporte a Dark Mode (Pure Black) e substituição da cor verde por Cinza Médio. A sidebar no desktop é estática com largura fixa de 80px e comportamento overlay (position: fixed) para estabilidade visual com zoom, rolagem ou redimensionamentos.
 - **Backend/Database**: Supabase
 - **Roteamento**: React Router v6
 - **PWA & Favicon**: Configuração de manifesto PWA (`manifest.json`) com suporte a ícones nos formatos PNG e JPEG (resoluções de 192x192 e 512x512 com propósitos `any` e `maskable` para Android) e tags de compatibilidade `apple-touch-icon` com múltiplos tamanhos no `index.html` usando `/GEASS1.png` para perfeita exibição de ícones na tela inicial do iOS.
