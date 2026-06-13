@@ -5,10 +5,10 @@ A Plataforma GEASS é um sistema de cursos focado em infoprodutos, estilo Kiwify
 
 ## Stack Tecnológica
 - **Frontend**: React, Vite, TypeScript
-- **Estilização**: CSS Puro com Variáveis (Glassmorphism), suporte a Dark Mode (Pure Black) e substituição da cor verde por Cinza Médio. A sidebar no desktop é estática com largura fixa de 80px e comportamento overlay (position: fixed) para estabilidade visual com zoom, rolagem ou redimensionamentos.
+- **Estilização**: CSS Puro com Variáveis (Glassmorphism), suporte a Dark Mode (Pure Black) e substituição da cor verde por Cinza Médio. A sidebar no desktop é estática com largura fixa de 80px e comportamento overlay (position: fixed) para estabilidade visual. No mobile, a barra se torna sticky no topo (`position: sticky`) para navegação facilitada. O scroll lateral de página é totalmente travado (`overflow-x: hidden`) no layout mobile e o zoom é bloqueado para melhor usabilidade em dispositivos móveis. Os campos de entrada têm tamanho de fonte fixo em `16px` para evitar o zoom automático indesejado no iOS Safari.
 - **Backend/Database**: Supabase
 - **Roteamento**: React Router v6
-- **PWA & Favicon**: Configuração de manifesto PWA (`manifest.json`) com suporte a ícones nos formatos PNG e JPEG (resoluções de 192x192 e 512x512 com propósitos `any` e `maskable` para Android) e tags de compatibilidade `apple-touch-icon` com múltiplos tamanhos no `index.html` usando `/GEASS1.png` para perfeita exibição de ícones na tela inicial do iOS.
+- **PWA & Favicon**: Configuração de manifesto PWA (`manifest.json`) com suporte a ícones nos formatos PNG e JPEG (resoluções de 192x192 e 512x512 com propósitos `any` e `maskable` para Android) e tags de compatibilidade `apple-touch-icon` com múltiplos tamanhos no `index.html` usando `/GEASS1.png` para perfeita exibição de ícones na tela inicial do iOS. O favicon principal do navegador e os logotipos internos do app (Login, Sidebar, Recuperação de Senha) utilizam os formatos de imagem rasterizada `/GEASS1.png` e `/GEASS.png` de alta resolução para máxima compatibilidade.
 
 ## Estrutura do Supabase
 As seguintes tabelas foram criadas e estão protegidas por Row Level Security (RLS) (podem ser configuradas executando o script `node supabase/cria_metas_tabelas.js`):
