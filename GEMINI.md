@@ -63,6 +63,13 @@ A aplicação passou por uma auditoria de segurança rigorosa focada no OWASP To
 - **Monitoramento de Sessões e Dispositivos (Exclusivo Admin)**: O painel administrativo possui uma aba para monitorar contas conectadas e sessões de dispositivos ativos. Essa funcionalidade utiliza as RPCs `obter_sessoes_ativas()`, `encerrar_sessao(sessao_id)` e `encerrar_todas_sessoes_usuario(target_user_id)` configuradas de forma segura com `SECURITY DEFINER` e validação do e-mail administrativo. O frontend renderiza de forma amigável o dispositivo (User-Agent decodificado), o endereço IP capturado nativamente pelo Supabase, a data de atividade, e sinaliza alertas visuais de "Compartilhamento Suspeito" para contas com 3 ou mais dispositivos ativos, permitindo ao administrador deslogar dispositivos específicos ou derrubar todas as sessões da conta com um clique.
 
 
+## Performance e Otimização
+Para garantir transições de abas e carregamento de páginas rápidos, a plataforma implementa as seguintes práticas de performance:
+- **Paralelização de Queries (`Promise.all`)**: As páginas `Dashboard`, `Course`, `StatsDashboard` e `GoalsDashboard` disparam todas as suas consultas ao banco de dados em paralelo após obter a sessão do usuário, eliminando gargalos de requisições sequenciais (waterfalls).
+- **Evitar Chamadas Redundantes do Auth**: O componente `Layout.tsx` executa a checagem `supabase.auth.getUser()` apenas uma única vez na montagem da plataforma (`[]`), e não em cada mudança de rota. Como a impersonação e o logout realizam recarregamento de página (`window.location.reload()`), essa abordagem é 100% segura e poupa centenas de requisições de rede lentas ao Auth.
+- **Processamento In-Memory**: O histórico de acessos recentes em `StatsDashboard` reaproveita os dados de progresso já carregados em memória (ordenando e limitando o array localmente), evitando uma consulta extra ao banco.
+- **Joins Relacionais no PostgREST**: Buscas complexas que envolvem dependências de tabelas (ex: `aulas` -> `modulos` -> `cursos`) são agrupadas em uma única query com select relacional no Supabase (`aulas.select('*, modulos(*, cursos(*)))'`), reduzindo o número de viagens de rede.
+
 ## Deploy e Produção
 - **Coolify**: A plataforma está configurada para deploy automatizado na VPS via Coolify.
   - Repositório Remoto: [Ervilhasantos/geass-plataforma-vps](https://github.com/Ervilhasantos/geass-plataforma-vps)
