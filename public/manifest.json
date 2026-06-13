@@ -4,6 +4,30 @@
   "description": "Plataforma de cursos e infoprodutos GEASS",
   "icons": [
     {
+      "src": "/GEASS1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/GEASS1.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
+      "src": "/GEASS.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "any"
+    },
+    {
+      "src": "/GEASS.png",
+      "sizes": "512x512",
+      "type": "image/png",
+      "purpose": "maskable"
+    },
+    {
       "src": "/GEASS.jpg",
       "sizes": "512x512",
       "type": "image/jpeg",

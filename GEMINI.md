@@ -8,7 +8,7 @@ A Plataforma GEASS é um sistema de cursos focado em infoprodutos, estilo Kiwify
 - **Estilização**: CSS Puro com Variáveis (Glassmorphism), suporte a Dark Mode (Pure Black) e substituição da cor verde por Cinza Médio.
 - **Backend/Database**: Supabase
 - **Roteamento**: React Router v6
-- **PWA & Favicon**: Configuração de manifesto PWA (`manifest.json`) com ícone do aplicativo (`GEASS.jpg`) e favicon personalizado (`GEASS1.png`).
+- **PWA & Favicon**: Configuração de manifesto PWA (`manifest.json`) com suporte a ícones nos formatos PNG e JPEG (resoluções de 192x192 e 512x512 com propósitos `any` e `maskable` para Android) e tags de compatibilidade `apple-touch-icon` com múltiplos tamanhos no `index.html` usando `/GEASS1.png` para perfeita exibição de ícones na tela inicial do iOS.
 
 ## Estrutura do Supabase
 As seguintes tabelas foram criadas e estão protegidas por Row Level Security (RLS) (podem ser configuradas executando o script `node supabase/cria_metas_tabelas.js`):
