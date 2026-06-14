@@ -2,7 +2,7 @@ import { useEffect, useState } from 'react';
 import { Outlet, Link, useNavigate, useLocation } from 'react-router-dom';
 import { supabase } from '../lib/supabase';
 import ThemeToggle from './ThemeToggle';
-import { BookOpen, LogOut, Settings, BarChart3, Target } from 'lucide-react';
+import { BookOpen, LogOut, Settings, BarChart3, Target, Key } from 'lucide-react';
 
 export default function Layout() {
   const navigate = useNavigate();
@@ -110,6 +110,9 @@ export default function Layout() {
 
         <div className="sidebar-footer">
           <ThemeToggle />
+          <Link to="/reset-password" title="Alterar Senha" className="btn sidebar-btn" style={{ color: 'var(--text-color)' }}>
+            <Key size={22} />
+          </Link>
           <button onClick={handleLogout} className="btn sidebar-btn" style={{ border: 'none', color: '#ef4444' }} title="Sair">
             <LogOut size={22} />
           </button>

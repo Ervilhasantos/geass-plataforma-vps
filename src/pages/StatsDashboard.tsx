@@ -412,7 +412,7 @@ export default function StatsDashboard() {
       <div className="stats-grid-middle">
         
         {/* Gráfico 1: Visão Geral de Engajamento */}
-        <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '440px' }}>
+        <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '440px', minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem', gap: '1rem' }}>
             <div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.25rem' }}>Visão Geral de Engajamento</h3>
@@ -552,7 +552,7 @@ export default function StatsDashboard() {
         </div>
 
         {/* Gráfico 2: Engajamento Semanal */}
-        <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '380px' }}>
+        <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '380px', minWidth: 0 }}>
           <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', marginBottom: '1rem' }}>
             <div>
               <h3 style={{ fontSize: '1.1rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.25rem' }}>Engajamento Semanal</h3>
@@ -601,7 +601,7 @@ export default function StatsDashboard() {
       <div className="stats-grid-bottom">
         
         {/* Gráfico da Esquerda: Donut Chart */}
-        <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '340px' }}>
+        <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '340px', minWidth: 0 }}>
           <div>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.25rem' }}>Distribuição de Tempo</h3>
             <span style={{ fontSize: '0.85rem', opacity: 0.5 }}>Divisão de tempo por curso (total)</span>
@@ -656,7 +656,7 @@ export default function StatsDashboard() {
         </div>
 
         {/* Tabela de Histórico */}
-        <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '340px' }}>
+        <div className="glass-panel" style={{ padding: '2rem', display: 'flex', flexDirection: 'column', justifyContent: 'space-between', minHeight: '340px', minWidth: 0 }}>
           <div style={{ marginBottom: '1rem' }}>
             <h3 style={{ fontSize: '1.1rem', fontWeight: 700, textTransform: 'uppercase', letterSpacing: '0.5px', marginBottom: '0.25rem' }}>Acessos Recentes</h3>
             <span style={{ fontSize: '0.85rem', opacity: 0.5 }}>Histórico de aulas iniciadas pelo usuário</span>
@@ -668,7 +668,7 @@ export default function StatsDashboard() {
                 Nenhuma aula assistida recentemente.
               </div>
             ) : (
-              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left', minWidth: '400px' }}>
+              <table style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
                 <thead>
                   <tr style={{ borderBottom: '1px solid var(--border-color)', opacity: 0.5 }}>
                     <th style={{ padding: '0.75rem 0.5rem', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase' }}>Aula</th>

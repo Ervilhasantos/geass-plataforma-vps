@@ -38,7 +38,7 @@ function App() {
     <Router>
       <Routes>
         <Route path="/login" element={!session ? <Login /> : <Navigate to="/" />} />
-        <Route path="/reset-password" element={!session ? <ResetPassword /> : <Navigate to="/" />} />
+        <Route path="/reset-password" element={<ResetPassword />} />
         <Route path="/" element={session ? <Layout /> : <Navigate to="/login" />}>
           <Route index element={<Dashboard />} />
           <Route path="stats" element={<StatsDashboard />} />
