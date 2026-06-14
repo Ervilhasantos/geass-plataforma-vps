@@ -669,46 +669,24 @@ export default function StatsDashboard() {
               </div>
             ) : (
               <div className="recent-accesses-container">
-                <table className="desktop-table" style={{ width: '100%', borderCollapse: 'collapse', textAlign: 'left' }}>
-                  <thead>
-                    <tr style={{ borderBottom: '1px solid var(--border-color)', opacity: 0.5 }}>
-                      <th style={{ padding: '0.75rem 0.5rem', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase' }}>Aula</th>
-                      <th style={{ padding: '0.75rem 0.5rem', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase' }}>Curso</th>
-                      <th style={{ padding: '0.75rem 0.5rem', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', width: '100px' }}>Progresso</th>
-                      <th style={{ padding: '0.75rem 0.5rem', fontSize: '0.8rem', fontWeight: 600, textTransform: 'uppercase', width: '100px', textAlign: 'right' }}>Data</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {historicoAulas.map((item, idx) => (
-                      <tr key={`${item.id}-${idx}`} style={{ borderBottom: '1px solid var(--border-color)', fontSize: '0.9rem' }}>
-                        <td style={{ padding: '0.85rem 0.5rem', fontWeight: 600, wordBreak: 'break-word', maxWidth: '180px' }}>{item.aulaNome}</td>
-                        <td style={{ padding: '0.85rem 0.5rem', opacity: 0.7, wordBreak: 'break-word', maxWidth: '140px' }}>{item.cursoNome}</td>
-                        <td style={{ padding: '0.85rem 0.5rem' }}>
-                          <div style={{ display: 'flex', alignItems: 'center', gap: '0.4rem' }}>
-                            <span style={{ fontSize: '0.8rem', fontWeight: 600 }}>{item.pct.toFixed(0)}%</span>
-                            <div className="progress-bar-container" style={{ margin: 0, height: '4px', width: '50px' }}>
-                              <div className="progress-bar-fill" style={{ width: `${item.pct}%` }}></div>
-                            </div>
-                          </div>
-                        </td>
-                        <td style={{ padding: '0.85rem 0.5rem', textAlign: 'right', opacity: 0.6, fontSize: '0.85rem' }}>{item.data}</td>
-                      </tr>
-                    ))}
-                  </tbody>
-                </table>
-
-                <div className="mobile-list" style={{ display: 'none', flexDirection: 'column', gap: '1rem' }}>
+                <div style={{ display: 'flex', flexDirection: 'column', gap: '1.25rem' }}>
                   {historicoAulas.map((item, idx) => (
-                    <div key={`mob-hist-${item.id}-${idx}`} style={{ padding: '0.75rem 0', borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '0.4rem' }}>
-                      <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-color)', lineHeight: 1.3 }}>{item.aulaNome}</div>
-                      <div style={{ fontSize: '0.8rem', opacity: 0.6 }}>{item.cursoNome}</div>
-                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', marginTop: '0.1rem' }}>
-                        <span style={{ fontSize: '0.75rem', fontWeight: 700 }}>{item.pct.toFixed(0)}%</span>
-                        <div className="progress-bar-container" style={{ margin: 0, height: '6px', flex: 1 }}>
-                          <div className="progress-bar-fill" style={{ width: `${item.pct}%` }}></div>
+                    <div key={`hist-${item.id}-${idx}`} style={{ padding: '0.85rem 0', borderBottom: '1px solid var(--border-color)', display: 'flex', flexDirection: 'column', gap: '0.5rem' }}>
+                      <div style={{ fontWeight: 600, fontSize: '0.95rem', color: 'var(--text-color)', lineHeight: 1.3 }}>
+                        {item.aulaNome}
+                      </div>
+                      <div style={{ fontSize: '0.8rem', opacity: 0.5, fontWeight: 500, marginTop: '-0.1rem' }}>
+                        {item.cursoNome}
+                      </div>
+                      <div style={{ display: 'flex', alignItems: 'center', gap: '0.75rem', marginTop: '0.1rem' }}>
+                        <span style={{ fontSize: '0.8rem', fontWeight: 700 }}>{item.pct.toFixed(0)}%</span>
+                        <div className="progress-bar-container" style={{ margin: 0, height: '6px', flex: 1, backgroundColor: 'var(--progress-bg)', borderRadius: '3px' }}>
+                          <div className="progress-bar-fill" style={{ width: `${item.pct}%`, height: '100%', backgroundColor: 'var(--primary-color)', borderRadius: '3px' }}></div>
                         </div>
                       </div>
-                      <div style={{ fontSize: '0.75rem', opacity: 0.5, textAlign: 'right', marginTop: '0.1rem' }}>{item.data}</div>
+                      <div style={{ fontSize: '0.75rem', opacity: 0.4, marginTop: '0.1rem' }}>
+                        Acessado em {item.data}
+                      </div>
                     </div>
                   ))}
                 </div>

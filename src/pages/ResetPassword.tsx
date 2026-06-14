@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { supabase } from '../lib/supabase';
 import { useNavigate } from 'react-router-dom';
 import ThemeToggle from '../components/ThemeToggle';
@@ -10,6 +10,20 @@ export default function ResetPassword() {
   const [error, setError] = useState('');
   const navigate = useNavigate();
 
+  useEffect(() => {
+    // Segurança: Só permite acesso se veio do fluxo de recuperação de senha
+    const isResetting = sessionStorage.getItem('is_resetting_password') === 'true';
+    if (!isResetting) {
+      supabase.auth.getSession().then(({ data: { session } }) => {
+        if (session) {
+          navigate('/');
+        } else {
+          navigate('/login');
+        }
+      });
+    }
+  }, [navigate]);
+
   const handleUpdatePassword = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
@@ -20,6 +34,9 @@ export default function ResetPassword() {
       const { error } = await supabase.auth.updateUser({ password });
       
       if (error) throw error;
+      
+      // Limpa a flag de segurança após a redefinição bem-sucedida
+      sessionStorage.removeItem('is_resetting_password');
       
       setMessage('Senha atualizada com sucesso! Redirecionando...');
       setTimeout(() => {

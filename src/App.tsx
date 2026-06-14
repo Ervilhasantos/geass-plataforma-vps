@@ -16,6 +16,18 @@ function App() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
+    // Detecta se o usuário veio de um link de recuperação de senha (contém type=recovery na URL)
+    const hasRecovery = window.location.hash.includes('type=recovery') || 
+                        window.location.search.includes('type=recovery');
+                        
+    if (hasRecovery) {
+      sessionStorage.setItem('is_resetting_password', 'true');
+      if (window.location.pathname !== '/reset-password') {
+        window.location.href = '/reset-password';
+        return;
+      }
+    }
+
     supabase.auth.getSession().then(({ data: { session } }) => {
       setSession(session);
       setLoading(false);
@@ -26,7 +38,10 @@ function App() {
     } = supabase.auth.onAuthStateChange((event, session) => {
       setSession(session);
       if (event === 'PASSWORD_RECOVERY') {
-        window.location.href = '/reset-password';
+        sessionStorage.setItem('is_resetting_password', 'true');
+        if (window.location.pathname !== '/reset-password') {
+          window.location.href = '/reset-password';
+        }
       }
     });
 
