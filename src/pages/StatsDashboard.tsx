@@ -349,7 +349,7 @@ export default function StatsDashboard() {
   }
 
   return (
-    <div className="animate-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', padding: '1rem 0' }}>
+    <div className="animate-fade-in" style={{ maxWidth: '1200px', margin: '0 auto', width: '100%', padding: '1rem' }}>
       
       {/* Título e Header */}
       <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '2.5rem' }}>
@@ -507,7 +507,7 @@ export default function StatsDashboard() {
           </div>
  
           <div style={{ flex: 1, width: '100%', height: '220px' }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="99%" height="100%">
               <AreaChart data={chartDataMensal} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
                 <defs>
                   {topCursos.map((curso, index) => (
@@ -571,7 +571,7 @@ export default function StatsDashboard() {
           </div>
 
           <div style={{ flex: 1, width: '100%', height: '180px', marginTop: '1rem' }}>
-            <ResponsiveContainer width="100%" height="100%">
+            <ResponsiveContainer width="99%" height="100%">
               <BarChart data={chartDataSemanal} margin={{ top: 10, right: 10, left: -20, bottom: 0 }}>
                 <XAxis dataKey="name" axisLine={false} tickLine={false} tick={{ fontSize: 12, fill: 'var(--text-color)', opacity: 0.5 }} interval={0} />
                 <Tooltip 
@@ -607,10 +607,10 @@ export default function StatsDashboard() {
             <span style={{ fontSize: '0.85rem', opacity: 0.5 }}>Divisão de tempo por curso (total)</span>
           </div>
 
-          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', margin: '1.5rem 0', flex: 1 }}>
+          <div style={{ display: 'flex', alignItems: 'center', gap: '1.5rem', margin: '1.5rem 0', flex: 1, flexWrap: 'wrap', justifyContent: 'center' }}>
             
-            <div style={{ position: 'relative', width: '130px', height: '130px' }}>
-              <ResponsiveContainer width="100%" height="100%">
+            <div style={{ position: 'relative', width: '130px', height: '130px', flexShrink: 0 }}>
+              <ResponsiveContainer width="99%" height="100%">
                 <PieChart>
                   <Pie
                     data={chartDataCursos}
@@ -636,7 +636,7 @@ export default function StatsDashboard() {
               </ResponsiveContainer>
             </div>
 
-            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1 }}>
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '0.75rem', flex: 1, minWidth: '180px' }}>
               {chartDataCursos.map((curso, idx) => {
                   const totalValue = chartDataCursos.reduce((acc, curr) => acc + curr.value, 0);
                   const pct = totalValue > 0 ? Math.round((curso.value / totalValue) * 100) : 0;

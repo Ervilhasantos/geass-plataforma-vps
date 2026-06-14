@@ -1281,30 +1281,32 @@ export default function Admin() {
                         transition: 'all 0.3s ease'
                       }}
                     >
-                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', flexWrap: 'wrap', gap: '0.5rem', marginBottom: '1rem' }}>
-                        <h4 style={{ display: 'flex', alignItems: 'center', gap: '0.5rem', fontSize: '1rem', margin: 0 }}>
-                          <span style={{ textOverflow: 'ellipsis', overflow: 'hidden', whiteSpace: 'nowrap' }}>{email}</span>
-                          <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.08)', padding: '0.1rem 0.4rem', borderRadius: '4px', opacity: 0.7 }}>
-                            {userSessoes.length} {userSessoes.length === 1 ? 'dispositivo' : 'dispositivos'}
-                          </span>
-                          {hasSuspiciousSharing && (
-                            <span 
-                              style={{ 
-                                display: 'inline-flex', 
-                                alignItems: 'center', 
-                                gap: '0.25rem', 
-                                fontSize: '0.75rem', 
-                                color: '#f87171', 
-                                background: 'rgba(239, 68, 68, 0.1)', 
-                                padding: '0.1rem 0.5rem', 
-                                borderRadius: '4px',
-                                fontWeight: 'bold' 
-                              }}
-                            >
-                              <ShieldAlert size={12} /> Compartilhamento Suspeito!
+                      <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start', flexWrap: 'wrap', gap: '0.75rem', marginBottom: '1rem', width: '100%' }}>
+                        <div style={{ display: 'flex', flexDirection: 'column', gap: '0.35rem', minWidth: 0, flex: '1 1 250px' }}>
+                          <span style={{ fontSize: '1rem', fontWeight: 600, wordBreak: 'break-all', color: 'var(--text-color)' }}>{email}</span>
+                          <div style={{ display: 'flex', gap: '0.5rem', flexWrap: 'wrap', alignItems: 'center' }}>
+                            <span style={{ fontSize: '0.75rem', background: 'rgba(255,255,255,0.08)', padding: '0.1rem 0.4rem', borderRadius: '4px', opacity: 0.7 }}>
+                              {userSessoes.length} {userSessoes.length === 1 ? 'dispositivo' : 'dispositivos'}
                             </span>
-                          )}
-                        </h4>
+                            {hasSuspiciousSharing && (
+                              <span 
+                                style={{ 
+                                  display: 'inline-flex', 
+                                  alignItems: 'center', 
+                                  gap: '0.25rem', 
+                                  fontSize: '0.75rem', 
+                                  color: '#f87171', 
+                                  background: 'rgba(239, 68, 68, 0.1)', 
+                                  padding: '0.1rem 0.5rem', 
+                                  borderRadius: '4px',
+                                  fontWeight: 'bold' 
+                                }}
+                              >
+                                <ShieldAlert size={12} /> Compartilhamento Suspeito!
+                              </span>
+                            )}
+                          </div>
+                        </div>
                         
                         {firstUserId && (
                           <button
@@ -1315,7 +1317,8 @@ export default function Admin() {
                               fontSize: '0.75rem', 
                               color: '#ef4444', 
                               borderColor: 'rgba(239, 68, 68, 0.2)',
-                              background: 'rgba(239, 68, 68, 0.02)'
+                              background: 'rgba(239, 68, 68, 0.02)',
+                              marginTop: '0.25rem'
                             }}
                           >
                             Derrubar Todas as Sessões
@@ -1323,7 +1326,7 @@ export default function Admin() {
                         )}
                       </div>
 
-                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(320px, 1fr))', gap: '0.75rem', paddingLeft: hasSuspiciousSharing ? '0rem' : '1rem' }}>
+                      <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fill, minmax(280px, 1fr))', gap: '0.75rem', paddingLeft: hasSuspiciousSharing ? '0rem' : '1rem' }}>
                         {userSessoes.map((sessao) => {
                           const deviceFriendly = formatarUserAgent(sessao.user_agent);
                           const isMobile = sessao.user_agent?.includes('iPhone') || sessao.user_agent?.includes('Android') || sessao.user_agent?.includes('iPad');
