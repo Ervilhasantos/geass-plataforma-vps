@@ -362,3 +362,13 @@ p {
 .spin-animation {
   animation: spin 1s linear infinite;
 }
+
+/* Responsive adjustments for Stats Dashboard accesses table */
+@media (max-width: 768px) {
+  .desktop-table {
+    display: none !important;
+  }
+  .mobile-list {
+    display: flex !important;
+  }
+}
